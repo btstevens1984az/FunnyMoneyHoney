@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#070b12"/>
+      <stop offset="100%" stop-color="#1a2438"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#g)"/>
+  <text x="80" y="80" font-family="Sora,sans-serif" font-size="40" font-weight="700" fill="#fff">FunnyMoneyHoney</text>
+  <text x="80" y="120" font-family="IBM Plex Sans,sans-serif" font-size="18" fill="#94a3b8">Dark-mode educational odds dashboard</text>
+  <rect x="80" y="160" width="640" height="420" rx="20" fill="#0c1220" stroke="rgba(255,255,255,0.08)"/>
+  <rect x="750" y="160" width="370" height="200" rx="20" fill="#0c1220" stroke="rgba(255,255,255,0.08)"/>
+  <rect x="750" y="380" width="370" height="200" rx="20" fill="#0c1220" stroke="rgba(232,184,75,0.25)"/>
+  <text x="110" y="210" font-family="IBM Plex Sans,sans-serif" font-size="20" fill="#e2e8f0">Today&apos;s markets</text>
+  <text x="110" y="260" font-family="IBM Plex Mono,monospace" font-size="14" fill="#2dd4bf">8 events · demo live feed</text>
+  <text x="780" y="210" font-family="IBM Plex Sans,sans-serif" font-size="18" fill="#e2e8f0">Value ranking</text>
+  <text x="780" y="250" font-family="IBM Plex Mono,monospace" font-size="14" fill="#e8b84b">#1 +1.4% · study</text>
+  <text x="780" y="430" font-family="IBM Plex Sans,sans-serif" font-size="18" fill="#fb7185">Pull alert</text>
+  <text x="780" y="470" font-family="IBM Plex Sans,sans-serif" font-size="14" fill="#94a3b8">Negative relative value  review or skip</text>
+  <text x="80" y="640" font-family="IBM Plex Sans,sans-serif" font-size="14" fill="#64748b">MIT · self-hosted · no sportsbook login · no bet placement</text>
+</svg>
