@@ -46,7 +46,11 @@ export function OddsTable({ events, selectedId, onSelect }: Props) {
                   event.bookmakers[0]?.markets[0];
                 const top = market?.outcomes
                   .slice()
-                  .sort((a, b) => b.relative_value - a.relative_value)[0];
+                  .sort(
+                    (a, b) =>
+                      b.relative_value - a.relative_value ||
+                      b.fair_probability - a.fair_probability,
+                  )[0];
                 const selected = selectedId === event.id;
                 return (
                   <tr

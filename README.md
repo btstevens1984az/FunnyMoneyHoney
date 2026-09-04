@@ -20,10 +20,10 @@ FunnyMoneyHoney does **not** claim historical profits, guaranteed win rates, or 
 
 | View | Preview |
 |------|---------|
-| Odds table | ![Today's markets with implied and fair probabilities](media/01-odds-table.svg) |
-| Probability lens | ![Implied vs fair probability bars](media/02-probability.svg) |
-| Bankroll simulator | ![$1000 daily bankroll Monte Carlo](media/03-bankroll.svg) |
-| Dark dashboard | ![Full dark-mode educational dashboard](media/04-dashboard.svg) |
+| Odds table | ![Today's markets with implied and fair probabilities](media/01-odds-table.png) |
+| Probability lens | ![Implied vs fair probability bars](media/02-probability.png) |
+| Bankroll simulator | ![$1000 daily bankroll Monte Carlo](media/03-bankroll.png) |
+| Dark dashboard | ![Full dark-mode educational dashboard](media/04-dashboard.png) |
 
 <p align="center">
   <img src="media/readme/01-odds-table.gif" alt="Odds table live loop" width="900" />
@@ -44,8 +44,16 @@ FunnyMoneyHoney does **not** claim historical profits, guaranteed win rates, or 
 Re-capture real UI loops (API `:8000`, UI `:5173`, Playwright + ffmpeg):
 
 ```bash
+# terminal 1 — API
+cd backend && source .venv/bin/activate
+uvicorn app.main:app --reload --port 8000
+
+# terminal 2 — UI
+cd frontend && npm run dev
+
+# terminal 3 — capture
 cd scripts && npm install && npx playwright install chromium
-node capture-readme.mjs
+FMH_URL=http://127.0.0.1:5173 node capture-readme.mjs
 ```
 
 See [docs/MEDIA.md](docs/MEDIA.md).

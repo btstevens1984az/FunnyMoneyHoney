@@ -2,47 +2,93 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
+
 from app.odds.probability import risk_flag_for_value
 from app.schemas import EventOdds, RankedOutcome
 
 
+def _market_raw_probs(outcomes) -> list[float] | None:
+    raw = [1.0 / o.price for o in outcomes if o.price > 1.0]
+    if not raw or len(raw) != len(outcomes):
+        return None
+    return raw
+
+
+def _consensus_and_counts(
+    event: EventOdds,
+) -> tuple[dict[tuple[str, str], float], dict[tuple[str, str], int]]:
+    """Average de-vigged probs across books + how many books quoted each outcome."""
+    buckets: dict[tuple[str, str], list[float]] = defaultdict(list)
+    for book in event.bookmakers:
+        for market in book.markets:
+            raw = _market_raw_probs(market.outcomes)
+            if not raw:
+                continue
+            total = sum(raw)
+            for outcome, implied in zip(market.outcomes, raw, strict=True):
+                buckets[(market.key, outcome.name)].append(implied / total)
+
+    consensus = {key: sum(vals) / len(vals) for key, vals in buckets.items() if vals}
+    counts = {key: len(vals) for key, vals in buckets.items()}
+    return consensus, counts
+
+
 def enrich_event(event: EventOdds) -> EventOdds:
     """Mutate markets with implied/fair probs, relative value, and risk flags."""
+    consensus, counts = _consensus_and_counts(event)
     best_value = -999.0
     best_label: str | None = None
     worst_flag = "ok"
 
     for book in event.bookmakers:
         for market in book.markets:
-            raw = [1.0 / o.price for o in market.outcomes if o.price > 1.0]
-            if not raw or len(raw) != len(market.outcomes):
+            raw = _market_raw_probs(market.outcomes)
+            if not raw:
                 continue
             total = sum(raw)
             overround = total - 1.0
             market.overround = round(overround, 4)
-            fair = [p / total for p in raw]
+            local_fair = [p / total for p in raw]
 
-            scored: list[tuple[int, float]] = []
             for idx, outcome in enumerate(market.outcomes):
+                key = (market.key, outcome.name)
+                fair = consensus.get(key, local_fair[idx])
                 outcome.implied_probability = round(raw[idx], 4)
-                outcome.fair_probability = round(fair[idx], 4)
-                outcome.overround_share = round(raw[idx] - fair[idx], 4)
-                outcome.relative_value = round(fair[idx] * outcome.price - 1.0, 4)
+                outcome.fair_probability = round(fair, 4)
+                outcome.overround_share = round(raw[idx] - local_fair[idx], 4)
+
+                # Cross-book edge only when ≥2 books quote this outcome.
+                # Single-book vig-removed "EV" is identical for every side — not useful.
+                if counts.get(key, 1) >= 2:
+                    outcome.relative_value = round(fair * outcome.price - 1.0, 4)
+                else:
+                    outcome.relative_value = 0.0
+
                 flag, reason = risk_flag_for_value(outcome.relative_value, overround)
                 outcome.risk_flag = flag  # type: ignore[assignment]
                 outcome.risk_reason = reason
-                scored.append((idx, outcome.relative_value))
+
                 if flag == "pull":
                     worst_flag = "pull"
                 elif flag == "caution" and worst_flag == "ok":
                     worst_flag = "caution"
-                if outcome.relative_value > best_value:
+
+                score = (outcome.relative_value, outcome.fair_probability)
+                best_score = (best_value, -1.0)
+                if score > best_score:
                     best_value = outcome.relative_value
                     best_label = f"{outcome.name} @ {book.title} ({market.key})"
 
-            # Higher relative value ⇒ safer educational rank (1 = best in market)
-            scored.sort(key=lambda t: t[1], reverse=True)
-            for rank, (idx, _) in enumerate(scored, start=1):
+            order = sorted(
+                range(len(market.outcomes)),
+                key=lambda i: (
+                    market.outcomes[i].relative_value,
+                    market.outcomes[i].fair_probability,
+                ),
+                reverse=True,
+            )
+            for rank, idx in enumerate(order, start=1):
                 market.outcomes[idx].safety_rank = rank
 
     event.best_value_outcome = best_label
@@ -50,16 +96,16 @@ def enrich_event(event: EventOdds) -> EventOdds:
     if worst_flag == "pull":
         event.analysis_summary = (
             "At least one priced outcome shows a strong educational pull/caution signal "
-            "(negative relative value or high overround)."
+            "(price worse than consensus fair odds, or high overround)."
         )
     elif worst_flag == "caution":
         event.analysis_summary = (
-            "Some outcomes show muted educational value after vig removal — review carefully."
+            "Some outcomes show muted educational value vs consensus fair odds — review carefully."
         )
     else:
         event.analysis_summary = (
-            "Markets enriched with fair probabilities after overround removal. "
-            "Relative value is an educational metric only."
+            "Markets enriched with consensus fair probabilities and relative value vs those odds. "
+            "Educational metrics only."
         )
     return event
 
@@ -71,10 +117,15 @@ def flatten_rankings(events: list[EventOdds], limit: int = 40) -> list[RankedOut
         for book in event.bookmakers:
             for market in book.markets:
                 for outcome in market.outcomes:
+                    note = (
+                        "vs consensus fair odds"
+                        if abs(outcome.relative_value) > 1e-9
+                        else "single-book quote (no cross-book edge signal)"
+                    )
                     analysis = (
-                        f"Implied {outcome.implied_probability:.1%} → fair {outcome.fair_probability:.1%} "
-                        f"after removing {market.overround:.1%} overround. "
-                        f"Relative value {outcome.relative_value:+.2%}."
+                        f"Implied {outcome.implied_probability:.1%} → fair "
+                        f"{outcome.fair_probability:.1%}; book overround {market.overround:.1%}. "
+                        f"Relative value {outcome.relative_value:+.2%} ({note})."
                     )
                     rows.append(
                         RankedOutcome(
@@ -95,8 +146,7 @@ def flatten_rankings(events: list[EventOdds], limit: int = 40) -> list[RankedOut
                             analysis=analysis,
                         )
                     )
-    rows.sort(key=lambda r: r.relative_value, reverse=True)
-    # Re-number global safety rank
+    rows.sort(key=lambda r: (r.relative_value, r.fair_probability), reverse=True)
     for i, row in enumerate(rows, start=1):
         row.safety_rank = i
     return rows[:limit]

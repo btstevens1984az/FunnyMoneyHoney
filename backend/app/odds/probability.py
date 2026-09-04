@@ -35,16 +35,16 @@ def relative_value(fair_probability: float, decimal_odds: float) -> float:
 
 def risk_flag_for_value(relative_value_score: float, overround: float) -> tuple[str, str | None]:
     """Heuristic caution / pull signals — not betting advice."""
-    if relative_value_score <= -0.08 or overround >= 0.12:
+    if overround >= 0.12 or relative_value_score <= -0.06:
         return (
             "pull",
-            "Educational signal: relative value is deeply negative or market overround is high. "
-            "Consider studying the market instead of treating this as a stake candidate.",
+            "Educational signal: this price is meaningfully worse than consensus fair odds, "
+            "or market overround is high. Study or skip — do not chase.",
         )
-    if relative_value_score <= -0.03 or overround >= 0.08:
+    if overround >= 0.075 or relative_value_score <= -0.02:
         return (
             "caution",
-            "Educational signal: muted or negative relative value after vig removal. "
-            "Treat as study-only — not a recommended stake.",
+            "Educational signal: muted or negative relative value vs consensus fair odds, "
+            "or elevated overround. Treat as study-only.",
         )
     return "ok", None

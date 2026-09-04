@@ -64,7 +64,13 @@ export default function App() {
       <main className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6">
         {error && (
           <div className="rounded-xl border border-coral-500/30 bg-coral-500/10 px-4 py-3 text-sm text-coral-400">
-            {error}
+            {error} — start the API on :8000 (`uvicorn app.main:app --port 8000`) or use Docker Compose.
+          </div>
+        )}
+
+        {!error && !feed && (
+          <div className="rounded-xl border border-white/10 bg-ink-900/60 px-4 py-8 text-center text-sm text-slate-400">
+            Loading today&apos;s markets…
           </div>
         )}
 

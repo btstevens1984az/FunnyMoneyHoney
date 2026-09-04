@@ -26,3 +26,51 @@ def test_relative_value_and_flags():
     assert reason
     flag2, _ = risk_flag_for_value(0.02, 0.04)
     assert flag2 == "ok"
+
+
+def test_consensus_relative_value_differs_across_books():
+    from datetime import datetime, timezone
+
+    from app.odds.ranking import enrich_event
+    from app.schemas import Bookmaker, EventOdds, Market, Outcome
+
+    event = EventOdds(
+        id="t1",
+        sport_key="basketball_nba",
+        sport_title="NBA",
+        commence_time=datetime.now(timezone.utc),
+        home_team="Home",
+        away_team="Away",
+        bookmakers=[
+            Bookmaker(
+                key="a",
+                title="BookA",
+                markets=[
+                    Market(
+                        key="h2h",
+                        outcomes=[
+                            Outcome(name="Away", price=1.90),
+                            Outcome(name="Home", price=1.95),
+                        ],
+                    )
+                ],
+            ),
+            Bookmaker(
+                key="b",
+                title="BookB",
+                markets=[
+                    Market(
+                        key="h2h",
+                        outcomes=[
+                            Outcome(name="Away", price=2.05),
+                            Outcome(name="Home", price=1.80),
+                        ],
+                    )
+                ],
+            ),
+        ],
+    )
+    enrich_event(event)
+    away_a = event.bookmakers[0].markets[0].outcomes[0].relative_value
+    away_b = event.bookmakers[1].markets[0].outcomes[0].relative_value
+    assert away_b > away_a  # longer Away price should score higher vs consensus

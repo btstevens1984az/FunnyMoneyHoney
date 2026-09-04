@@ -2,37 +2,39 @@
 
 README screenshots and GIFs live in `media/` and `media/readme/`.
 
-## Placeholder assets
+## Assets
 
-SVG stills ship by default so the README renders immediately. Replace them with real captures when you can.
+| Path | Purpose |
+|------|---------|
+| `media/*.png` | Still screenshots for the README table |
+| `media/readme/*.gif` | ~9s looping demos of the live UI |
 
-## Capture live GIFs (Playwright + ffmpeg)
+Do **not** commit solid-color placeholder GIFs. Always capture from a running app.
 
-Requires the API on `:8000` and the UI on `:5173`.
+## Capture live PNG + GIF (Playwright + ffmpeg)
+
+Requires the API on `:8000` and the UI on `:5173` (or set `FMH_URL`).
 
 ```bash
-# terminal 1
+# terminal 1 — API
 cd backend && source .venv/bin/activate
 uvicorn app.main:app --reload --port 8000
 
-# terminal 2
+# terminal 2 — UI
 cd frontend && npm run dev
 
-# terminal 3
+# terminal 3 — capture
 cd scripts
 npm install
 npx playwright install chromium
-node capture-readme.mjs
+FMH_URL=http://127.0.0.1:5173 node capture-readme.mjs
 ```
 
-Outputs (≈8–12s loops):
+Outputs:
 
-- `media/readme/01-odds-table.gif`
-- `media/readme/02-probability.gif`
-- `media/readme/03-bankroll.gif`
-- `media/readme/04-dashboard.gif`
-
-Optional MP4s are written alongside if `ffmpeg` is on `PATH`.
+- `media/01-odds-table.png` … `media/04-dashboard.png`
+- `media/readme/01-odds-table.gif` … `media/readme/04-dashboard.gif`
+- Optional MP4s beside the GIFs when `ffmpeg` is available
 
 ## Topics for GitHub
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api, type AnalysisResponse, type EventOdds } from "../api/client";
 
 interface Props {
@@ -8,6 +8,33 @@ interface Props {
 export function ThinkingPanel({ event }: Props) {
   const [result, setResult] = useState<AnalysisResponse | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!event) {
+      setResult(null);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    const outcome = event.bookmakers[0]?.markets[0]?.outcomes[0];
+    void api
+      .analyze({
+        event_id: event.id,
+        outcome_name: outcome?.name,
+      })
+      .then((data) => {
+        if (!cancelled) setResult(data);
+      })
+      .catch(() => {
+        if (!cancelled) setResult(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [event]);
 
   async function run() {
     if (!event) return;
@@ -48,6 +75,10 @@ export function ThinkingPanel({ event }: Props) {
         </button>
       </div>
 
+      {loading && !result && (
+        <p className="mt-4 text-sm text-slate-500">Running educational analysis…</p>
+      )}
+
       {result && (
         <div className="mt-4 space-y-3">
           <div className="flex flex-wrap items-center gap-3">
@@ -69,7 +100,7 @@ export function ThinkingPanel({ event }: Props) {
               </div>
             </div>
           </div>
-          <ol className="space-y-1.5 text-xs text-slate-400">
+          <ol className="max-h-40 space-y-1.5 overflow-y-auto text-xs text-slate-400">
             {result.thinking.map((step, i) => (
               <li key={i} className="flex gap-2">
                 <span className="font-mono text-slate-600">{i + 1}.</span>

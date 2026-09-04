@@ -76,6 +76,19 @@
             ]
           }
         ]
+      },
+      {
+        "key": "fanduel",
+        "title": "FanDuel",
+        "markets": [
+          {
+            "key": "h2h",
+            "outcomes": [
+              {"name": "Denver Nuggets", "price": 1.80},
+              {"name": "Los Angeles Lakers", "price": 2.05}
+            ]
+          }
+        ]
       }
     ]
   },
@@ -113,6 +126,19 @@
             ]
           }
         ]
+      },
+      {
+        "key": "betmgm",
+        "title": "BetMGM",
+        "markets": [
+          {
+            "key": "h2h",
+            "outcomes": [
+              {"name": "Kansas City Chiefs", "price": 1.95},
+              {"name": "Buffalo Bills", "price": 1.87}
+            ]
+          }
+        ]
       }
     ]
   },
@@ -143,6 +169,19 @@
             ]
           }
         ]
+      },
+      {
+        "key": "draftkings",
+        "title": "DraftKings",
+        "markets": [
+          {
+            "key": "h2h",
+            "outcomes": [
+              {"name": "New York Yankees", "price": 1.90},
+              {"name": "Boston Red Sox", "price": 1.95}
+            ]
+          }
+        ]
       }
     ]
   },
@@ -163,6 +202,19 @@
             "outcomes": [
               {"name": "Toronto Maple Leafs", "price": 1.70},
               {"name": "Montreal Canadiens", "price": 2.20}
+            ]
+          }
+        ]
+      },
+      {
+        "key": "fanduel",
+        "title": "FanDuel",
+        "markets": [
+          {
+            "key": "h2h",
+            "outcomes": [
+              {"name": "Toronto Maple Leafs", "price": 1.76},
+              {"name": "Montreal Canadiens", "price": 2.10}
             ]
           }
         ]
@@ -234,6 +286,19 @@
             ]
           }
         ]
+      },
+      {
+        "key": "draftkings",
+        "title": "DraftKings",
+        "markets": [
+          {
+            "key": "h2h",
+            "outcomes": [
+              {"name": "Golden State Warriors", "price": 2.20},
+              {"name": "Phoenix Suns", "price": 1.70}
+            ]
+          }
+        ]
       }
     ]
   },
@@ -261,6 +326,19 @@
             "outcomes": [
               {"name": "Over", "price": 1.91, "point": 45.5},
               {"name": "Under", "price": 1.91, "point": 45.5}
+            ]
+          }
+        ]
+      },
+      {
+        "key": "pinnacle",
+        "title": "Pinnacle",
+        "markets": [
+          {
+            "key": "h2h",
+            "outcomes": [
+              {"name": "San Francisco 49ers", "price": 1.70},
+              {"name": "Dallas Cowboys", "price": 2.22}
             ]
           }
         ]
