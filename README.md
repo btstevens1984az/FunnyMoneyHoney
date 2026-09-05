@@ -25,22 +25,6 @@ FunnyMoneyHoney does **not** claim historical profits, guaranteed win rates, or 
 | Bankroll simulator | ![$1000 daily bankroll Monte Carlo](media/03-bankroll.png) |
 | Dark dashboard | ![Full dark-mode educational dashboard](media/04-dashboard.png) |
 
-<p align="center">
-  <img src="media/readme/01-odds-table.gif" alt="Odds table live loop" width="900" />
-</p>
-
-<p align="center">
-  <img src="media/readme/02-probability.gif" alt="Probability view loop" width="900" />
-</p>
-
-<p align="center">
-  <img src="media/readme/03-bankroll.gif" alt="Bankroll simulation loop" width="900" />
-</p>
-
-<p align="center">
-  <img src="media/readme/04-dashboard.gif" alt="Dashboard overview loop" width="900" />
-</p>
-
 Re-capture real UI loops (API `:8000`, UI `:5173`, Playwright + ffmpeg):
 
 ```bash
